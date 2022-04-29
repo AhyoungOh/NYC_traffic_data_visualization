@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<script src="https://d3js.org/d3.v6.js"></script>
+
+<div id="mydata"></div>
+<body>
+<script>
+  const margin = { top: 10, right: 30, bottom: 30, left: 40 },
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+  const svg = d3
+    .select('#mydata')
+    .append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  d3.csv('./data/NYC_Traffic.csv').then(function (data) {
+    var getData = [
+			{
+				name: "1",
+				count: 0
+		  },{
+        name: "2",
+				count: 0
+		  },{ 
+        name: "3",
+				count: 0
+		  },{ 
+        name: "4",
+				count: 0
+		  },{ 
+        name: "5",
+				count: 0
+		  },{ 
+        name: "6",
+				count: 0
+		  },{ 
+        name: "7",
+				count: 0
+		  },{ 
+        name: "8",
+				count: 0
+		  },{ 
+        name: "9",
+				count: 0
+		  },{ 
+        name: "10",
+				count: 0
+		  },{ 
+        name: "11",
+				count: 0
+		  },{ 
+        name: "12",
+				count: 0
+		  },{ 
+        name: "13",
+				count: 0
+		  },{ 
+        name: "14",
+				count: 0
+		  },{
+        name: "15",
+				count: 0
+		  },{
+				name: "16",
+				count: 0
+		  },
+	  ];
+	data.map(d => {
+		if (d.VEHICLE_TYPE === "VEHOCLE TYPE 1") {
+			getData[0].count++;
+		}
+		else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 2") {
+			getData[1].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 3") {
+			getData[2].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 4") {
+			getData[3].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 5") {
+			getData[4].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 6") {
+			getData[5].count++;
+		}
+		else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 7") {
+			getData[6].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 8") {
+			getData[7].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 9") {
+			getData[8].count++;
+		}
+		else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 10") {
+			getData[9].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 11") {
+			getData[10].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 12") {
+			getData[11].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 13") {
+			getData[12].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 14") {
+			getData[13].count++;
+		}
+    else if (d.VEHICLE_TYPE === "VEHOCLE TYPE 15") {
+			getData[14].count++;
+		}
+		else {
+			getData[15].count++;
+		}
+	})
+    const x = d3.scaleBand().range([0, width]).padding(0.2);
+    x.domain(
+      getData.map(function (d) {
+        return d.name;
+      })
+    );
+    const y = d3.scaleLinear().range([height, 0]);
+		y.domain([
+      0,
+      d3.max(getData, function (d) {
+        return d.count;
+      }),
+    ]); 
+
+    svg
+      .append('g')
+			.attr('class', 'x axis')
+      .attr('transform', `translate(0, ${height})`)
+      .call(d3.axisBottom(x))
+			.append('text')
+			.attr('x', 6)
+			.attr('dy', '.7cm')
+      .attr('dx', '.4cm')
+      .style('fill', 'black')
+      .text('Vehicle Type');
+
+    svg
+			.append('g')
+			.attr('class', 'y axis')
+			.call(d3.axisLeft(y))
+			.append('text')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 6)
+      .attr('dy', '-.9cm')
+      .style('fill', 'black')
+      .text('Number of Crash');
+
+    svg
+      .selectAll('rect')
+      .data(getData)
+      .enter()
+			.append('rect')
+      .attr('x', function (d) {
+				return x(d.name);
+			})
+			.attr("y", function(d) {
+				return y(d.count)
+			})
+			.attr("width", x.bandwidth())
+      .attr("height", (data) => height - y(data.count))
+      .style('fill', '#5648d8');
+
+		//label
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '.8cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("1:Sedan")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '1.1cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("2:Taxi")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '1.4cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("3:Ambulance")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '1.7cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("4:Station Wagon/Sport Utility Vehicle")
+			.style("font-size", "7px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '2cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("5:PK")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '2.3cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("6:Bus")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '2.6cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("7:Box Truck")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '2.9cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("8:DUMP")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '3.2cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("9:Bike")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '3.5cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("10:Van")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '3.8cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("11:Pick-up Truck")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '4.1cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("12:Tractor Truck Diesel")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '4.4cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("13:Tractor Truck Gasolin")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '4.7cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("14:Motorscooter")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '5cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("15:LIMO")
+			.style("font-size", "10px");
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '5.3cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("16:usps")
+			.style("font-size", "10px");
+			svg
+        .selectAll('.bartext')
+        .data(getData)
+        .enter()
+        .append('text')
+        .attr('class', 'bartext')
+        .text(function (d) {
+          return d.count;
+        })
+        .attr('x', function (d) {
+          return x(d.name) + 8;
+        })
+        .attr('y', function (d, i) {
+          return y(d.count);
+        })
+        .attr('font-size', '10px')
+        .attr('fill', 'black')
+        .attr('text-anchor', 'middle');
+  });  
+</script>
+</body></html>

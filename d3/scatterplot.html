@@ -1,0 +1,238 @@
+<meta charset="utf-8" />
+
+<script src="https://d3js.org/d3.v6.js"></script>
+
+<div id="mydata"></div>
+
+X:
+<select id="selectButtonX"></select>
+Y:
+<select id="selectButtonY"></select>
+
+<script>
+  const margin = { top: 10, right: 30, bottom: 30, left: 60 },
+    width = 1400,
+    height = 400 - margin.top - margin.bottom;
+
+  const svg = d3
+    .select('#mydata')
+    .append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  d3.csv('./data/NYC_Traffic.csv', function (d) {
+    return {
+      CRASH_DATE: d3.timeParse('%Y-%m-%d')(d.CRASH_DATE),
+      CRASH_TIME: d3.timeParse('%H:%M:%S')(d.CRASH_TIME),
+      BOROUGH: d.BOROUGH,
+      VEHICLE_TYPE: d.VEHICLE_TYPE,
+      NUMBER_OF_PERSONS_INJURED: d.NUMBER_OF_PERSONS_INJURED,
+      NUMBER_OF_PERSONS_KILLED: d.NUMBER_OF_PERSONS_KILLED,
+      NUMBER_OF_MOTORIST_INJURED: d.NUMBER_OF_MOTORIST_INJURED,
+      NUMBER_OF_MOTORIST_KILLED: d.NUMBER_OF_MOTORIST_KILLED,
+    };
+  }).then(function (data) {
+    var getData = [
+      {
+        name: 'BOROUGH 1',
+        count: 0,
+      },
+      {
+        name: 'BOROUGH 2',
+        count: 0,
+      },
+      {
+        name: 'BOROUGH 3',
+        count: 0,
+      },
+      {
+        name: 'BOROUGH 4',
+        count: 0,
+      },
+      {
+        name: 'BOROUGH 5',
+        count: 0,
+      },
+    ];
+    // console.log('data ', data);
+    var typeData = [
+      { name: 'VEHOCLE TYPE 1' },
+      { name: 'VEHOCLE TYPE 2' },
+      { name: 'VEHOCLE TYPE 3' },
+      { name: 'VEHOCLE TYPE 4' },
+      { name: 'VEHOCLE TYPE 5' },
+      { name: 'VEHOCLE TYPE 6' },
+      { name: 'VEHOCLE TYPE 7' },
+      { name: 'VEHOCLE TYPE 8' },
+      { name: 'VEHOCLE TYPE 9' },
+      { name: 'VEHOCLE TYPE 10' },
+      { name: 'VEHOCLE TYPE 11' },
+      { name: 'VEHOCLE TYPE 12' },
+      { name: 'VEHOCLE TYPE 13' },
+      { name: 'VEHOCLE TYPE 14' },
+      { name: 'VEHOCLE TYPE 15' },
+      { name: 'VEHOCLE TYPE 16' },
+    ];
+    var attributesX = ['CRASH_DATE', 'CRASH_TIME', 'BOROUGH', 'VEHICLE_TYPE'];
+
+    var attributesY = [
+      'NUMBER_OF_PERSONS_INJURED',
+      'NUMBER_OF_PERSONS_KILLED',
+      'NUMBER_OF_MOTORIST_INJURED',
+      'NUMBER_OF_MOTORIST_KILLED',
+    ];
+
+    d3.select('#selectButtonX')
+      .selectAll('myOptions')
+      .data(attributesX)
+      .enter()
+      .append('option')
+      .text((d) => d)
+      .attr('value', (d) => d);
+
+    d3.select('#selectButtonY')
+      .selectAll('myOptions')
+      .data(attributesY)
+      .enter()
+      .append('option')
+      .text((d) => d)
+      .attr('value', (d) => d);
+    const x = d3
+      .scaleTime()
+      .domain(d3.extent(data, (d) => d.CRASH_DATE))
+      .range([0, width]);
+    const xAxis = svg
+      .append('g')
+      .attr('transform', 'translate(0,' + height + ')')
+      .call(d3.axisBottom(x));
+    const y = d3.scaleLinear().domain([0, 3]).range([height, 0]);
+    const yAxis = svg.append('g').call(d3.axisLeft(y));
+
+    const original = svg
+      .append('g')
+      .selectAll('dot')
+      .data(data)
+      .join('circle')
+      .attr('cx', (d) => x(d.CRASH_DATE))
+      .attr('cy', function (d) {
+        return y(d.NUMBER_OF_PERSONS_INJURED);
+      })
+      .attr('r', 2)
+      .attr('fill', '#5648d8');
+
+    function updateTime(input) {
+      var dataFilter = data.map(function (d) {
+        return { newX: d[input] };
+      });
+
+      x.domain(d3.extent(data, (d) => d.CRASH_TIME));
+      xAxis.transition().duration(1000).call(d3.axisBottom(x));
+
+      original
+        .data(dataFilter)
+        .transition()
+        .duration(1000)
+        .attr('cx', function (d) {
+          return x(+d.newX);
+        });
+    }
+
+    function updateDate(input) {
+      var dataFilter = data.map(function (d) {
+        return { newX: d[input] };
+      });
+      console.log(dataFilter);
+      //reset x-axis
+      x.domain(d3.extent(data, (d) => d.CRASH_DATE));
+      xAxis.transition().duration(1000).call(d3.axisBottom(x));
+
+      original
+        .data(dataFilter)
+        .transition()
+        .duration(1000)
+        .attr('cx', function (d) {
+          return x(+d.newX);
+        });
+    }
+
+    function updateBor(input) {
+      var dataFilter = data.map(function (d) {
+        return { newX: d[input] };
+      });
+      console.log(dataFilter);
+      //reset x-axis
+      const x = d3.scaleBand().range([0, width]).padding(0.2);
+      x.domain(
+        getData.map(function (d) {
+          return d.name;
+        })
+      );
+      xAxis.transition().duration(1000).call(d3.axisBottom(x));
+
+      original
+        .data(dataFilter)
+        .transition()
+        .duration(1000)
+        .attr('cx', function (d) {
+          return x(d.newX);
+        });
+    }
+
+    function updateType(input) {
+      var dataFilter = data.map(function (d) {
+        return { newX: d[input] };
+      });
+      console.log(dataFilter);
+      const x = d3.scaleBand().range([0, width]);
+      x.domain(
+        typeData.map(function (d) {
+          return d.name;
+        })
+      );
+      xAxis.transition().duration(1000).call(d3.axisBottom(x));
+
+      original
+        .data(dataFilter)
+        .transition()
+        .duration(1000)
+        .attr('cx', function (d) {
+          return x(d.newX);
+        });
+    }
+
+    function updateY(selectedGroupY) {
+      var dataFilter = data.map(function (d) {
+        return { newY: d[selectedGroupY] };
+      });
+
+      original
+        .data(dataFilter)
+        .transition()
+        .duration(1000)
+        .attr('cy', function (d) {
+          return y(+d.newY);
+        });
+    }
+
+    d3.select('#selectButtonX').on('change', function (d) {
+      var selectedOptionX = d3.select(this).property('value');
+      if (selectedOptionX == 'CRASH_DATE') {
+        updateDate(selectedOptionX);
+      } else if (selectedOptionX == 'BOROUGH') {
+        updateBor(selectedOptionX);
+      } else if (selectedOptionX == 'CRASH_TIME') {
+        updateTime(selectedOptionX);
+      } else {
+        updateType(selectedOptionX);
+      }
+    });
+
+    d3.selectAll('#selectButtonY').on('change', function (d) {
+      var selectedOptionY = d3.select(this).property('value');
+      console.log(this.value);
+      updateY(selectedOptionY);
+    });
+  });
+</script>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<script src="https://d3js.org/d3.v6.js"></script>
+
+<div id="mydata"></div>
+<body>
+<script>
+  const margin = { top: 10, right: 30, bottom: 30, left: 40 },
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+  const svg = d3
+    .select('#mydata')
+    .append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  d3.csv('./data/NYC_Traffic.csv').then(function (data) {
+		var getData = [
+			{
+				name: "BOROUGH 1",
+				count: 0
+		},{
+				name: "BOROUGH 2",
+				count: 0
+		},{
+				name: "BOROUGH 3",
+				count: 0
+		},{
+				name: "BOROUGH 4",
+				count: 0
+		},{
+				name: "BOROUGH 5",
+				count: 0
+		},
+	];
+	data.map(d => {
+		if (d.BOROUGH === "BOROUGH 1") {
+			getData[0].count++;
+		}
+		else if (d.BOROUGH === "BOROUGH 2") {
+			getData[1].count++;
+		}
+		else if (d.BOROUGH === "BOROUGH 3") {
+			getData[2].count++;
+		}
+		else if (d.BOROUGH === "BOROUGH 4") {
+			getData[3].count++;
+		}
+		else {
+			getData[4].count++;
+		}
+	})
+    const x = d3.scaleBand().range([0, width]).padding(0.2);
+    x.domain(
+      getData.map(function (d) {
+        return d.name;
+      })
+    );
+		const y = d3.scaleLinear().range([height, 0]);
+		y.domain([
+      0,
+      d3.max(getData, function (d) {
+        return d.count;
+      }),
+    ]);
+    svg
+      .append('g')
+			.attr('class', 'x axis')
+      .attr('transform', `translate(0, ${height})`)
+      .call(d3.axisBottom(x))
+			.append('text')
+			.attr('x', 6)
+			.attr('dy', '.8cm')
+      .attr('dx', '.4cm')
+      .style('fill', 'black')
+      .text('Location');
+    
+		//label
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '.8cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("Borough1: Queens")
+			.style("font-size", "10px")
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '1.1cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("Borough2: Bronx")
+			.style("font-size", "10px")
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '1.4cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("Borough3: Brooklyn")
+			.style("font-size", "10px")
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '1.7cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("Borough4: Manhattan")
+			.style("font-size", "10px")
+		svg
+			.append('g')
+			.attr('class', 'legend')
+			.append("text")
+			.attr('dy', '2cm')
+      .attr('dx', '8cm')
+			.style('fill', 'black')
+			.text("Borough5: Staten Island")
+			.style("font-size", "10px")
+
+    svg
+			.append('g')
+			.attr('class', 'y axis')
+			.call(d3.axisLeft(y))
+			.append('text')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 6)
+      .attr('dy', '-.9cm')
+      .style('fill', 'black')
+      .text('Number of Crash');
+
+    svg
+      .selectAll('rect')
+      .data(getData)
+			.enter()
+			.append('rect')
+      .attr('x', function (d) {
+				return x(d.name);
+			})
+			.attr("y", function(d) {
+				return y(d.count)
+			})
+			.attr("width", x.bandwidth())
+    	.attr("height", (data) => height - y(data.count))
+      .style('fill', '#5648d8');
+		
+			//label
+			svg
+        .selectAll('.bartext')
+        .data(getData)
+        .enter()
+        .append('text')
+        .attr('class', 'bartext')
+        .text(function (d) {
+          return d.count;
+        })
+        .attr('x', function (d) {
+          return x(d.name) + 30;
+        })
+        .attr('y', function (d, i) {
+          return y(d.count);
+        })
+        .attr('font-size', '13px')
+        .attr('fill', 'black')
+        .attr('text-anchor', 'middle');
+  });
+</script>
+</body></html>
